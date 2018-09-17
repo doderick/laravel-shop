@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,7 +15,16 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'email_verified',
+    ];
+
+    /**
+     * 需要进行类型转换的参数
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified' => 'boolean',
     ];
 
     /**
