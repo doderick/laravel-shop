@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
@@ -32,5 +33,21 @@ class Product extends Model
     public function skus()
     {
         return $this->hasMany(ProductSku::class);
+    }
+
+    /**
+     * 图片绝对路径访问器
+     *
+     * @return 商品图片的绝对路径
+     */
+    public function getImageUrlAttribute()
+    {
+        // 先判断 image 字段是否为完整的 url
+        // 如果是完整的 url 直接返回
+        if (Str::startsWith($this->attributes['image'], ['http://', 'https://'])) {
+            return $this->attributes['image'];
+        }
+        // 如果不是完整的 url ，则拼接完整的 url
+        return \Storage::disk('public')->url($this->attributes['image']);
     }
 }
