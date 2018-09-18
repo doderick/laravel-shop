@@ -69,14 +69,14 @@ Vue.component('select-district', {
             // 过滤掉空格
             value = _.filter(value);
             // 如果数组长度为 0，则将省清空，市区会联动
-            if (value.lenght === 0) {
+            if (value.length === 0) {
                 this.provinceId = '';
                 return;
             }
             // 从当前省列表中找到与数组第一个元素同名的项的索引
             const provinceId = _.findKey(this.provinces, o => o === value[0]);
             // 如果没有找到，清空省的值
-            if (provinceId) {
+            if (!provinceId) {
                 this.provinceId = '';
                 return;
             }
@@ -85,7 +85,7 @@ Vue.component('select-district', {
             // 从当前城市列表中找到与数组第二个元素同名的项的索引
             const cityId = _.findKey(addressData[provinceId], o => o === value[1]);
             // 如果没有找到，清空城市的值
-            if (cityId) {
+            if (!cityId) {
                 this.cityId = '';
                 return;
             }
@@ -94,7 +94,7 @@ Vue.component('select-district', {
             // 从当前地区列表中找到与数组第三个元素同名的项的索引
             const districtId = _.findKey(addressData[cityId], o => o === value[2]);
             // 如果没找到，清空地区的值
-            if (districtId) {
+            if (!districtId) {
                 this.districtId = '';
                 return;
             }

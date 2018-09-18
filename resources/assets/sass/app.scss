@@ -17,6 +17,16 @@ body {
     border-top: 4px solid #00b5ad;
     margin-top: 0px;
     margin-bottom: 40px;
+    .dropdown-menu {
+        padding: 0px;
+        li a {
+            border-bottom: 1px solid #d8d8d8;
+            line-height: 2.4;
+            .glyphicon {
+                margin-right: 8px;
+            }
+        }
+    }
 }
 
 /* footer */
