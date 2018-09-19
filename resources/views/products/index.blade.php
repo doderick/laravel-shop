@@ -27,9 +27,15 @@
                         <div class="col-xs-3 product-item">
                             <div class="product-content">
                                 <div class="top">
-                                    <div class="img"><img src="{{ $product->image_url }}"></div>
+                                    <div class="img">
+                                        <a href="{{ route('products.show', ['product' => $product->id]) }}" target="_blank">
+                                            <img src="{{ $product->image_url }}" title="{{ $product->title }}">
+                                        </a>
+                                    </div>
                                     <div class="price"><b>￥</b>{{ $product->price }}</div>
-                                    <div class="title">{{ $product->title }}</div>
+                                    <div class="title">
+                                        <a href="{{ route('products.show', ['product' => $product->id]) }}" target="_blank">{{ $product->title }}</a>
+                                    </div>
                                 </div>
                                 <div class="bottom">
                                     <div class="sold_count">销量 <span>{{ $product->sold_count }}笔</span></div>
