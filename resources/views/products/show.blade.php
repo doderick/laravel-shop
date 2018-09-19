@@ -105,6 +105,9 @@
                 {{-- 如果返回码是 401 表示用户没有登录 --}}
                 if (error.response && error.response.status === 401) {
                     swal('请先登录', '', 'error')
+                    .then(function() {
+                        location.href = '{{ route('login') }}';
+                    })
                 {{-- 如果有其它 msg，则将 msg 提示给用户 --}}
                 } else if (error.response && error.response.data.msg) {
                     swal(error.response.data.msg, '', 'error');
@@ -132,10 +135,16 @@
                 amount: $('.cart_amount input').val(),
             })
             .then(function () {
-                swal('加入购物车成功', '', 'success');
+                swal('加入购物车成功', '', 'success')
+                .then(function () {
+                    location.href = '{{ route('cart.index') }}';
+                });
             }, function (error) {
                 if (error.response.status === 401) {
-                    swal('请先登录', '', 'error');
+                    swal('请先登录', '', 'error')
+                    .then(function() {
+                        location.href = '{{ route('login') }}';
+                    })
                 } else if (error.response.status === 422) {
                     var html = '<div>';
                         _.each(error.response.data.errors, function (errors) {

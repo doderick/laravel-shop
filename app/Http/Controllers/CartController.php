@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CartItem;
+use App\Models\ProductSku;
 use Illuminate\Http\Request;
 use App\Http\Requests\AddCartRequest;
 
@@ -33,6 +34,34 @@ class CartController extends Controller
             $cart->productSku()->associate($skuId);
             $cart->save();
         }
+
+        return [];
+    }
+
+    /**
+     * 显示购物车
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function index(Request $request)
+    {
+        // ’productSku.product‘ 加载多层级的关联关系，预加载防止 N+1
+        $cartItems = $request->user()->cartItems()->with(['productSku.product'])->get();
+
+        return view('cart.index', ['cartItems' => $cartItems]);
+    }
+
+    /**
+     * 从购物车中移除商品
+     *
+     * @param ProductSku $sku
+     * @param Request $request
+     * @return void
+     */
+    public function remove(ProductSku $sku, Request $request)
+    {
+        $request->user()->cartItems()->where('product_sku_id', $sku->id)->delete();
 
         return [];
     }
