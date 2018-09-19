@@ -51,7 +51,11 @@
                             <input type="text" class="form-control input-sm" value="1"><span>件</span><span class="stock"></span>
                         </div>
                         <div class="buttons">
-                            <button class="btn btn-success btn-favor">❤ 收藏</button>
+                            @if ($favored)
+                                <button class="btn btn-danger btn-disfavor">取消收藏</button>
+                            @else
+                                <button class="btn btn-success btn-favor">❤ 收藏</button>
+                            @endif
                             <button class="btn btn-primary btn-add-to-cart">加入购物车</button>
                         </div>
                     </div>
@@ -82,9 +86,43 @@
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip({trigger: 'hover'});
+        {{-- 监听 SKU 按钮的点击事件 --}}
         $('.sku-btn').click(function () {
+            {{-- 根据 SKU 写入价格及库存 --}}
             $('.product-info .price span').text($(this).data('price'));
             $('.product-info .stock').text('库存：' + $(this).data('stock') + '件');
+        });
+        {{-- 监听收藏按钮的点击事件 --}}
+        $('.btn-favor').click(function () {
+            {{-- 发起一个 post ajax 请求，请求 url 通过后端的 route() 函数完成 --}}
+            axios.post('{{ route('products.favor', ['product' => $product->id]) }}')
+            .then(function () { {{-- 请求成功时执行 --}}
+                swal('操作成功', '', 'success')
+                .then(function () {
+                    location.reload();
+                });
+            }, function(error) { {{-- 请求失败时执行 --}}
+                {{-- 如果返回码是 401 表示用户没有登录 --}}
+                if (error.response && error.response.status === 401) {
+                    swal('请先登录', '', 'error')
+                {{-- 如果有其它 msg，则将 msg 提示给用户 --}}
+                } else if (error.response && error.response.data.msg) {
+                    swal(error.response.data.msg, '', 'error');
+                {{-- 其它情况则是系统错误 --}}
+                } else {
+                    swal('系统错误', '', 'error');
+                }
+            });
+        });
+        {{-- 监听取消收藏按钮的点击时间 --}}
+        $('.btn-disfavor').click(function () {
+            axios.delete('{{ route('products.disfavor', ['product' => $product->id]) }}')
+            .then(function () {
+                swal('操作成功', '', 'success')
+                .then(function () {
+                    location.reload();
+                });
+            });
         });
     });
 </script>
