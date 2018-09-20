@@ -170,7 +170,7 @@
                             content: $(html)[0],
                             icon: 'error',
                         });
-                    } else {
+                    } else {}
                         {{-- 其它情况则是系统出错 --}}
                         swal('系统错误', '', 'error');
                     }
