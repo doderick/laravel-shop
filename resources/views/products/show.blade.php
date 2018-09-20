@@ -25,8 +25,7 @@
                             <div class="rating" title="评分 {{ $product->rating }}">
                                 评分
                                 <span class="count">
-                                    {{ str_repeat('★', floor($product->rating)) }}
-                                    {{ str_repeat('☆', 5 - floor($product->rating)) }}
+                                    {{ str_repeat('★', floor($product->rating)) }}{{ str_repeat('☆', 5 - floor($product->rating)) }}
                                 </span>
                             </div>
                         </div>

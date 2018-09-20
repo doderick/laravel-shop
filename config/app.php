@@ -127,6 +127,13 @@ return [
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
 
+    /**
+     * 未支付订单自动关闭的时间
+     * 时间单位为 秒
+     */
+
+    'order_ttl' => 1800,
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
