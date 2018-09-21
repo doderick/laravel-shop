@@ -80,6 +80,19 @@ class PaymentController extends Controller
             'payment_no' => $data->trade_no,
         ]);
 
+        $this->afterPaid($order);
+
         return app('alipay')->success();
+    }
+
+    /**
+     * 触发 OrderPaid 事件
+     *
+     * @param Order $order
+     * @return void
+     */
+    protected function afterPaid(Order $order)
+    {
+        event(new OrderPaid($order));
     }
 }
