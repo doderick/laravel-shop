@@ -7,82 +7,91 @@
         <div class="panel panel-default">
             <div class="panel-heading">我的购物车</div>
             <div class="panel-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="select-all"></th>
-                            <th>商品信息</th>
-                            <th>单价</th>
-                            <th>数量</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody class="product_list">
-                        @foreach ($cartItems as $item)
-                            <tr data-id="{{ $item->productSku->id }}">
-                                <td>
-                                    <input type="checkbox" name="select" value="{{ $item->productSku->id }}" {{ $item->productSku->product->on_sale ? 'checked' : 'disabled' }}>
-                                </td>
-                                <td class="product_info">
-                                    <div class="preview">
-                                        <a href="{{ route('products.show', [$item->productSku->product_id]) }}" target="_blank">
-                                            <img src="{{ $item->productSku->product->image_url }}">
-                                        </a>
-                                    </div>
-                                    <div @if(!$item->productSku->product->on_sale) class="not_on_sale" @endif>
-                                        <span class="product_title">
-                                            <a href="{{ route('products.show', [$item->productSku->product_id]) }}" target="_blank">{{ $item->productSku->product->title }}</a>
-                                        </span>
-                                        <span class="sku_title">{{ $item->productSku->title }}</span>
-                                        @if(!$item->productSku->product->on_sale)
-                                            <span class="warning">该商品已下架</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td><span class="price">￥{{ $item->productSku->price }}</span></td>
-                                <td>
-                                    <input type="text" class="form-control input-sm amount"
-                                            @if (! $item->productSku->product->on_sale) disabled
-                                            @endif name="amount" value="{{ $item->amount }}">
-                                </td>
-                                <td>
-                                    <button class="btn btn-xs btn-danger btn-remove">移除</button>
-                                </td>
+                @if (count($cartItems) > 0)
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all"></th>
+                                <th>商品信息</th>
+                                <th>单价</th>
+                                <th>数量</th>
+                                <th>操作</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                {{-- 输入地址开始 --}}
-                <div>
-                    <form class="form-horizontal" role="form" id="order-form">
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">选择收货地址</label>
-                            <div class="col-sm-9 col-md-7">
-                                <select name="address" class="form-control">
-                                    @foreach ($addresses as $address)
-                                        <option value="{{ $address->id }}">
-                                            {{ $address->full_address }}
-                                            {{ $address->contact_name }}
-                                            {{ $address->contact_phone }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        </thead>
+                        <tbody class="product_list">
+                            @foreach ($cartItems as $item)
+                                <tr data-id="{{ $item->productSku->id }}">
+                                    <td>
+                                        <input type="checkbox" name="select" value="{{ $item->productSku->id }}" {{ $item->productSku->product->on_sale ? 'checked' : 'disabled' }}>
+                                    </td>
+                                    <td class="product_info">
+                                        <div class="preview">
+                                            <a href="{{ route('products.show', [$item->productSku->product_id]) }}" target="_blank">
+                                                <img src="{{ $item->productSku->product->image_url }}">
+                                            </a>
+                                        </div>
+                                        <div @if(!$item->productSku->product->on_sale) class="not_on_sale" @endif>
+                                            <span class="product_title">
+                                                <a href="{{ route('products.show', [$item->productSku->product_id]) }}" target="_blank">{{ $item->productSku->product->title }}</a>
+                                            </span>
+                                            <span class="sku_title">{{ $item->productSku->title }}</span>
+                                            @if(!$item->productSku->product->on_sale)
+                                                <span class="warning">该商品已下架</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td><span class="price">￥{{ $item->productSku->price }}</span></td>
+                                    <td>
+                                        <input type="text" class="form-control input-sm amount"
+                                                @if (! $item->productSku->product->on_sale) disabled
+                                                @endif name="amount" value="{{ $item->amount }}">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-xs btn-danger btn-remove">移除</button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    {{-- 输入地址开始 --}}
+                    <div>
+                        <form class="form-horizontal" role="form" id="order-form">
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">选择收货地址</label>
+                                <div class="col-sm-9 col-md-7">
+                                    <select name="address" class="form-control">
+                                        @if (! count($addresses))
+                                            <option value="">你还没添加过收货地址</option>
+                                        @else
+                                            @foreach ($addresses as $address)
+                                                <option value="{{ $address->id }}">
+                                                    {{ $address->full_address }}
+                                                    {{ $address->contact_name }}
+                                                    {{ $address->contact_phone }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label col-sm-3">备注</label>
-                            <div class="col-sm-9 col-md-7">
-                                <textarea name="remark" class="form-control" rows="3"></textarea>
+                            <div class="form-group">
+                                <label class="control-label col-sm-3">备注</label>
+                                <div class="col-sm-9 col-md-7">
+                                    <textarea name="remark" class="form-control" rows="3"></textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-3 col-sm-offset-3">
-                                <button type="button" class="btn btn-primary btn-create-order">提交订单</button>
+                            <div class="form-group">
+                                <div class="col-sm-3 col-sm-offset-3">
+                                    <button type="button" class="btn btn-primary btn-create-order">提交订单</button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
-                {{-- 输入地址结束 --}}
+                        </form>
+                    </div>
+                    {{-- 输入地址结束 --}}
+                @else
+                    <h4>购物车空空如也</h4>
+                    <a href="{{ route('root') }}" role="button" class="btn btn-primary">去逛逛</a>
+                @endif
             </div>
         </div>
     </div>
@@ -153,8 +162,8 @@
             axios.post('{{ route('orders.store') }}', req)
                 .then(function (response) {
                     swal('订单提交成功', '', 'success')
-                    .then(function () {
-                        location.reload();
+                    .then(() => {
+                        location.href = '/orders/' + response.data.id;
                     });
                 }, function (error) {
                     if (error.response.status === 422) {
@@ -170,7 +179,7 @@
                             content: $(html)[0],
                             icon: 'error',
                         });
-                    } else {}
+                    } else {
                         {{-- 其它情况则是系统出错 --}}
                         swal('系统错误', '', 'error');
                     }
