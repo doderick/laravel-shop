@@ -6,9 +6,11 @@ use App\Models\Order;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
+use App\Exceptions\InvalidRequestException;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class OrdersController extends Controller
@@ -112,63 +114,31 @@ class OrdersController extends Controller
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed   $id
-     * @return Show
-     */
-    protected function detail($id)
+    public function ship(Order $order, Request $request)
     {
-        $show = new Show(Order::findOrFail($id));
+        // 判断当前订单是否已支付
+        if (! $order->paid_at) {
+            throw new InvalidRequestException('该订单为付款');
+        }
+        // 判断当前订单发货状态是否为未发货
+        if ($order->ship_status !== Order::SHIP_STATUS_PENDING) {
+            throw new InvalidRequestException('该订单已发货');
+        }
+        $data = $this->validate($request, [
+            'express_company' => ['required'],
+            'express_no'      => ['required'],
+        ], [], [
+            'express_company' => '物流公司',
+            'express_no'      => '物流单号',
+        ]);
+        // 将订单发货状态改为已发货，并存入物流信息
+        $order->update([
+            'ship_status' => Order::SHIP_STATUS_DELIVERED,
+            'ship_data'   => $data,
+        ]);
 
-        $show->id('Id');
-        $show->no('No');
-        $show->user_id('User id');
-        $show->address('Address');
-        $show->total_amount('Total amount');
-        $show->remark('Remark');
-        $show->paid_at('Paid at');
-        $show->payment_method('Payment method');
-        $show->payment_no('Payment no');
-        $show->refund_status('Refund status');
-        $show->refund_no('Refund no');
-        $show->closed('Closed');
-        $show->reviewed('Reviewed');
-        $show->ship_status('Ship status');
-        $show->ship_data('Ship data');
-        $show->extra('Extra');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
-
-        return $show;
+        // 返回上一页
+        return redirect()->back();
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        $form = new Form(new Order);
-
-        $form->text('no', 'No');
-        $form->number('user_id', 'User id');
-        $form->textarea('address', 'Address');
-        $form->decimal('total_amount', 'Total amount');
-        $form->textarea('remark', 'Remark');
-        $form->datetime('paid_at', 'Paid at')->default(date('Y-m-d H:i:s'));
-        $form->text('payment_method', 'Payment method');
-        $form->text('payment_no', 'Payment no');
-        $form->text('refund_status', 'Refund status')->default('pending');
-        $form->text('refund_no', 'Refund no');
-        $form->switch('closed', 'Closed');
-        $form->switch('reviewed', 'Reviewed');
-        $form->text('ship_status', 'Ship status')->default('pending');
-        $form->textarea('ship_data', 'Ship data');
-        $form->textarea('extra', 'Extra');
-
-        return $form;
-    }
 }
