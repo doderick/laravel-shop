@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Exceptions\InvalidRequestException;
+use App\Events\OrderPaid;
 
 class PaymentController extends Controller
 {
@@ -32,7 +33,7 @@ class PaymentController extends Controller
             // 订单金额，单位元，支持小数点后两位
             'total_amount' => $order->total_amount,
             // 订单标题
-            'subject' => '支付 Laravel 商城 的订单：' . $order->no,
+            'subject'      => '支付 Laravel 商城 的订单：' . $order->no,
         ]);
     }
 
@@ -75,9 +76,9 @@ class PaymentController extends Controller
         }
 
         $order->update([
-            'paid_at' => Carbon::now(),
+            'paid_at'        => Carbon::now(),
             'payment_method' => 'alipay',
-            'payment_no' => $data->trade_no,
+            'payment_no'     => $data->trade_no,
         ]);
 
         $this->afterPaid($order);

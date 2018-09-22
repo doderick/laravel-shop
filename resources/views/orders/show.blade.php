@@ -68,6 +68,7 @@
                                 {{ $order->no }}
                             </div>
                         </div>
+                        {{-- 输出物流状态 --}}
                         <div class="line">
                             <div class="line-label">
                                 物流状态：
@@ -76,6 +77,16 @@
                                 {{ \App\Models\Order::$shipStatusMap[$order->ship_status] }}
                             </div>
                         </div>
+                        {{-- 如果有物流信息，则展示 --}}
+                        @if ($order->ship_data)
+                            <div class="line">
+                                <div class="line-label">物流信息：</div>
+                                <div class="line-value">
+                                    {{ $order->ship_data['express_company'] }}
+                                    {{ $order->ship_data['express_no'] }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                     <div class="order-summary text-right">
                         <div class="total-amount">
@@ -105,10 +116,46 @@
                             </div>
                         @endif
                         {{-- 支付按钮结束 --}}
+                        {{-- 如果订单已发货则展示收货按钮 --}}
+                        @if ($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
+                            <div class="receive-button">
+                                <form action="{{ route('orders.received', [$order->id]) }}" method="post">
+                                    {{ csrf_field() }}
+                                    <button type="button" id="btn-receive" class="btn btn-sm btn-success">确认收货</button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@stop
+
+@section('scriptsAfterJs')
+<script>
+    $(document).ready(function () {
+        {{-- 监听收货按钮的点击事件 --}}
+        $('#btn-receive').click(function () {
+            swal({
+                title: '确认已经收到商品了？',
+                icon: 'warning',
+                buttons: true,
+                dangerMode: true,
+                buttons: ['取消','确认收货'],
+            })
+            .then(function (ret) {
+                if (! ret) {
+                    return;
+                }
+                {{-- ajax 提交确认操作 --}}
+                axios.post('{{ route('orders.received', [$order->id]) }}')
+                .then(function () {
+                    location.reload();
+                });
+            });
+        });
+    });
+</script>
 @stop
