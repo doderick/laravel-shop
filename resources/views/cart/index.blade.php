@@ -13,9 +13,9 @@
                             <tr>
                                 <th><input type="checkbox" id="select-all"></th>
                                 <th>商品信息</th>
-                                <th>单价</th>
-                                <th>数量</th>
-                                <th>操作</th>
+                                <th class="text-center" style="width: 120px;">单价</th>
+                                <th class="text-center" style="width: 140px;">数量</th>
+                                <th class="text-center" style="width: 120px;">操作</th>
                             </tr>
                         </thead>
                         <tbody class="product_list">
@@ -40,13 +40,15 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td><span class="price">￥{{ $item->productSku->price }}</span></td>
-                                    <td>
-                                        <input type="text" class="form-control input-sm amount"
+                                    <td class="text-center">
+                                        <span class="price">￥{{ $item->productSku->price }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="text" class="form-control input-sm amount text-center"
                                                 @if (! $item->productSku->product->on_sale) disabled
                                                 @endif name="amount" value="{{ $item->amount }}">
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <button class="btn btn-xs btn-danger btn-remove">移除</button>
                                     </td>
                                 </tr>

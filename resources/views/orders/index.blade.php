@@ -21,11 +21,11 @@
                                             <thead>
                                                 <tr>
                                                     <th>商品信息</th>
-                                                    <th class="text-center">单价</th>
-                                                    <th class="text-center">数量</th>
-                                                    <th class="text-center">订单总价</th>
-                                                    <th class="text-center">状态</th>
-                                                    <th class="text-center">操作</th>
+                                                    <th class="text-center" style="width: 100px;">单价</th>
+                                                    <th class="text-center" style="width: 100px;">数量</th>
+                                                    <th class="text-center" style="width: 140px;">订单总价</th>
+                                                    <th class="text-center" style="width: 140px;">状态</th>
+                                                    <th class="text-center" style="width: 140px;">操作</th>
                                                 </tr>
                                             </thead>
                                             @foreach ($order->items as $index => $item)

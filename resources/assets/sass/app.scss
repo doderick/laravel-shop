@@ -249,6 +249,11 @@ body {
 }
 
 .cart-index-page {
+    .table {
+        tbody :first-child :nth-child(2) {
+            border: none;
+        }
+    }
     .product_list {
         .preview {
             img {
@@ -288,6 +293,7 @@ body {
         }
         input.amount {
             width: 60px;
+            margin: auto;
             border-radius: 0 !important;
         }
     }
