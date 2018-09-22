@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Order;
+use App\Events\OrderPaid;
 use Illuminate\Http\Request;
 use App\Exceptions\InvalidRequestException;
-use App\Events\OrderPaid;
 
 class PaymentController extends Controller
 {

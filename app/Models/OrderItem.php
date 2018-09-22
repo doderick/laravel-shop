@@ -12,7 +12,7 @@ class OrderItem extends Model
         'price',
         'rating',
         'review',
-        'review_at',
+        'reviewed_at',
     ];
 
     // 声明需要转换为日期的属性
