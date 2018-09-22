@@ -87,6 +87,17 @@
                                 </div>
                             </div>
                         @endif
+                        {{-- 订单已支付，且退款状态不是未退款时展示退款信息 --}}
+                        @if ($order->paid_at && $order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+                            <div class="line">
+                                <div class="line-label">退款状态：</div>
+                                <div class="line-value">{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}</div>
+                            </div>
+                            <div class="line">
+                                <div class="line-label">退款理由：</div>
+                                <div class="line-value">{{ $order->extra['refund_reason'] }}</div>
+                            </div>
+                        @endif
                     </div>
                     <div class="order-summary text-right">
                         <div class="total-amount">
@@ -125,6 +136,12 @@
                                 </form>
                             </div>
                         @endif
+                        {{-- 订单已支付，且退款状态是未退款时展示申请退款按钮 --}}
+                        @if ($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
+                            <div class="refund-button">
+                                <button id="btn-apply-refund" class="btn btn-sm btn-danger">申请退款</button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -153,6 +170,26 @@
                 axios.post('{{ route('orders.received', [$order->id]) }}')
                 .then(function () {
                     location.reload();
+                });
+            });
+        });
+        {{-- 监听退款按钮点击事件 --}}
+        $('#btn-apply-refund').click(function () {
+            swal({
+                text: '请输入退款理由',
+                content: 'input',
+            }).then(function (input) {
+                if (! input) {
+                    swal ('退款理由不可空', '', 'error');
+                    return;
+                }
+                // 请求退款接口
+                axios.post('{{ route('orders.apply_refund', [$order->id]) }}', {reason: input})
+                .then(function () {
+                    swal('申请退款成功', '', 'success')
+                    .then(function () {
+                        location.reload();
+                    });
                 });
             });
         });

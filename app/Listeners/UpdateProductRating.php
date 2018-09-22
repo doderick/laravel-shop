@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-// use DB;
 use App\Models\OrderItem;
 use App\Events\OrderReviewed;
 use Illuminate\Queue\InteractsWithQueue;
