@@ -6,6 +6,7 @@ use App\Models\Order;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -30,16 +31,16 @@ class OrdersController extends Controller
     /**
      * Show interface.
      *
-     * @param mixed   $id
-     * @param Content $content
+     * @param Order $order
      * @return Content
      */
-    public function show($id, Content $content)
+    public function show(Order $order)
     {
-        return $content
-            ->header('Detail')
-            ->description('description')
-            ->body($this->detail($id));
+        return Admin::content(function (Content $content) use ($order) {
+            $content->header('查看订单');
+            // body 方法可以接受 Laravel 的视图作为参数
+            $content->body(view('admin.orders.show', ['order' => $order]));
+        });
     }
 
     /**
@@ -98,7 +99,6 @@ class OrdersController extends Controller
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             // 禁用删除和编辑按钮
-            $actions->disableView();
             $actions->disableDelete();
             $actions->disableEdit();
         });
