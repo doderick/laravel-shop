@@ -102,9 +102,9 @@
 
 @section('scriptsAfterJs')
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         {{-- 监听移除按钮事件 --}}
-        $('.btn-remove').click(function () {
+        $('.btn-remove').click(function() {
             var id = $(this).closest('tr').data('id');
             swal({
                 title: '确认要将该商品删除？',
@@ -115,25 +115,25 @@
             .then(function(willDelete) {
                 if (! willDelete) return;
                 axios.delete('/cart/' + id)
-                .then(function () {
+                .then(function() {
                     location.reload();
                 });
             });
         });
         {{-- 监听 全选/取消 单选框的变更事件 --}}
-        $('#select-all').change(function () {
+        $('#select-all').change(function() {
             {{-- 获取单选框的选中状态 --}}
             {{-- prop() 方法可以知道标签中是否包含某个属性，当单选框被勾选时，对应的标签就会新增一个 checked 的属性 --}}
             var checked = $(this).prop('checked');
             {{-- 获取所有 name=select 并且不带有 disabled 属性的勾选框 --}}
             {{-- 对于已经下架的商品我们不希望对应的勾选框会被选中，因此我们需要加上 :not([disabled]) 这个条件 --}}
-            $('input[name=select][type=checkbox]:not([disabled])').each(function () {
+            $('input[name=select][type=checkbox]:not([disabled])').each(function() {
                 {{-- 将其勾选状态设为与目标单选框一致 --}}
                 $(this).prop('checked', checked);
             });
         });
         {{-- 监听创建订单按钮的点击事件 --}}
-        $('.btn-create-order').click(function () {
+        $('.btn-create-order').click(function() {
             {{-- 构建请求参数，将用户选择的地址的 id 和备注内容写入请求参数 --}}
             var req = {
                 address_id: $('#order-form').find('select[name=address]').val(),
@@ -141,7 +141,7 @@
                 remark: $('#order-form').find('textarea[name=remark]').val(),
             };
             {{-- 遍历购物车中的商品 SKU --}}
-            $('table tr[data-id]').each(function () {
+            $('table tr[data-id]').each(function() {
                 {{-- 获得当前行的复选框 --}}
                 var $checkbox = $(this).find('input[name=select][type=checkbox]');
                 {{-- 如果复选框被禁用或者没有选中则跳过 --}}
@@ -162,17 +162,17 @@
             });
             {{-- 执行提交 --}}
             axios.post('{{ route('orders.store') }}', req)
-                .then(function (response) {
+                .then(function(response) {
                     swal('订单提交成功', '', 'success')
                     .then(() => {
                         location.href = '/orders/' + response.data.id;
                     });
-                }, function (error) {
+                }, function(error) {
                     if (error.response.status === 422) {
                         {{-- http 状态码为 422 代表用户输入校验失败 --}}
                         var html = '<div>';
-                        _.each(error.response.data.errors, function (errors) {
-                            _.each(errors, function (error) {
+                        _.each(error.response.data.errors, function(errors) {
+                            _.each(errors, function(error) {
                                 html += error + '<br>';
                             });
                         });

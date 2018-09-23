@@ -108,21 +108,21 @@
 
 @section('scriptsAfterJs')
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('[data-toggle="tooltip"]').tooltip({trigger: 'hover'});
         {{-- 监听 SKU 按钮的点击事件 --}}
-        $('.sku-btn').click(function () {
+        $('.sku-btn').click(function() {
             {{-- 根据 SKU 写入价格及库存 --}}
             $('.product-info .price span').text($(this).data('price'));
             $('.product-info .stock').text('库存：' + $(this).data('stock') + '件');
         });
         {{-- 监听收藏按钮的点击事件 --}}
-        $('.btn-favor').click(function () {
+        $('.btn-favor').click(function() {
             {{-- 发起一个 post ajax 请求，请求 url 通过后端的 route() 函数完成 --}}
             axios.post('{{ route('products.favor', ['product' => $product->id]) }}')
-            .then(function () { {{-- 请求成功时执行 --}}
+            .then(function() { {{-- 请求成功时执行 --}}
                 swal('操作成功', '', 'success')
-                .then(function () {
+                .then(function() {
                     location.reload();
                 });
             }, function(error) { {{-- 请求失败时执行 --}}
@@ -142,28 +142,28 @@
             });
         });
         {{-- 监听取消收藏按钮的点击时间 --}}
-        $('.btn-disfavor').click(function () {
+        $('.btn-disfavor').click(function() {
             axios.delete('{{ route('products.disfavor', ['product' => $product->id]) }}')
-            .then(function () {
+            .then(function() {
                 swal('操作成功', '', 'success')
-                .then(function () {
+                .then(function() {
                     location.reload();
                 });
             });
         });
         {{-- 监听加入购物车按钮 --}}
-        $('.btn-add-to-cart').click(function () {
+        $('.btn-add-to-cart').click(function() {
             // 请求加入购物车接口
             axios.post('{{ route('cart.add') }}', {
                 sku_id: $('label.active input[name=skus]').val(),
                 amount: $('.cart_amount input').val(),
             })
-            .then(function () {
+            .then(function() {
                 swal('加入购物车成功', '', 'success')
-                .then(function () {
+                .then(function() {
                     location.href = '{{ route('cart.index') }}';
                 });
-            }, function (error) {
+            }, function(error) {
                 if (error.response.status === 401) {
                     swal('请先登录', '', 'error')
                     .then(function() {
@@ -171,8 +171,8 @@
                     })
                 } else if (error.response.status === 422) {
                     var html = '<div>';
-                        _.each(error.response.data.errors, function (errors) {
-                            _.each(errors, function (error) {
+                        _.each(error.response.data.errors, function(errors) {
+                            _.each(errors, function(error) {
                                 html += error+'<br>';
                             })
                         });

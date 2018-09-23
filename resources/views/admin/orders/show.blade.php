@@ -91,7 +91,67 @@
                     </tr>
                 @endif
                 {{-- 订单发货结束 --}}
+                {{-- 退款处理开始 --}}
+                @if ($order->refund_status !== \App\Models\Order::REFUND_STATUS_PENDING)
+                    <tr>
+                        <td>退款状态：</td>
+                        <td colspan="2">{{ \App\Models\Order::$refundStatusMap[$order->refund_status] }}，理由：{{ $order->extra['refund_reason'] }}</td>
+                        <td>
+                            {{--  如果订单退款状态是已申请，则展示处理按钮--}}
+                            @if ($order->refund_status === \App\Models\Order::REFUND_STATUS_APPLIED)
+                                <button id="btn-refund-agree" class="btn btn-sm btn-success">同意</button>
+                                <button id="btn-refund-disagree" class="btn btn-sm btn-danger">不同意</button>
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+                {{-- 退款处理结束 --}}
             </tbody>
         </table>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    {{-- 监听「不同意」按钮的点击事件 --}}
+    $('#btn-refund-disagree').click(function() {
+        swal({
+            title: '输入拒绝理由',
+            type: 'input',
+            showCancelButton: true,
+            closeOnConfirm: false,
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+        }, function(inputValue) {
+            {{-- 用户点击了取消，inputValue 为 false --}}
+            {{-- '===' 是为了区分用户点击取消还是没有输入 --}}
+            if (inputValue === false) {
+                return;
+            }
+            if (! inputValue) {
+                swal('理由不能为空', '', 'error')
+                return;
+            }
+            {{-- Laravel-Admin 没有 axios，使用 jQuery 的 ajax 方法来请求 --}}
+            $.ajax({
+                url: '{{ route('admin.orders.handle_refund', [$order->id]) }}',
+                type: 'post',
+                data: JSON.stringify({  {{-- 将请求变成 JSON 字符串 --}}
+                    agree: false,   {{-- 拒绝申请 --}}
+                    reason: inputValue,
+                    {{-- 通过 LA.token 获得 CSRF Token --}}
+                    _token: LA.token,
+                }),
+                contentType: 'application/json',    {{-- 请求的数据格式为 JSON --}}
+                success: function(data) {   {{-- 返回成功时会调用这个函数 --}}
+                    swal({
+                        title: '操作成功',
+                        type: 'success'
+                    }, function() {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    });
+});
+</script>

@@ -56,7 +56,7 @@
 @section('scriptsAfterJs')
     <script>
         var filters = {!! json_encode($filters) !!};
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.search-form input[name=search]').val(filters.search);
             $('.search-form select[name=order]').val(filters.order);
             $('.search-form select[name=order]').on('change', function() {

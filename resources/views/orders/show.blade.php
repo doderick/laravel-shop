@@ -120,6 +120,13 @@
                                 @endif
                             </div>
                         </div>
+                        {{-- 展示拒绝退款理由 --}}
+                        @if (isset($order->extra['refund_disagree_reason']))
+                            <div>
+                                <span>拒绝退款理由：</span>
+                                <div class="value">{{ $order->extra['refund_disagree_reason'] }}</div>
+                            </div>
+                        @endif
                         {{-- 支付按钮开始 --}}
                         @if (! $order->paid_at && ! $order->closed)
                             <div class="payment-buttons">
@@ -152,9 +159,9 @@
 
 @section('scriptsAfterJs')
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         {{-- 监听收货按钮的点击事件 --}}
-        $('#btn-receive').click(function () {
+        $('#btn-receive').click(function() {
             swal({
                 title: '确认已经收到商品了？',
                 icon: 'warning',
@@ -162,32 +169,32 @@
                 dangerMode: true,
                 buttons: ['取消','确认收货'],
             })
-            .then(function (ret) {
+            .then(function(ret) {
                 if (! ret) {
                     return;
                 }
                 {{-- ajax 提交确认操作 --}}
                 axios.post('{{ route('orders.received', [$order->id]) }}')
-                .then(function () {
+                .then(function() {
                     location.reload();
                 });
             });
         });
         {{-- 监听退款按钮点击事件 --}}
-        $('#btn-apply-refund').click(function () {
+        $('#btn-apply-refund').click(function() {
             swal({
                 text: '请输入退款理由',
                 content: 'input',
-            }).then(function (input) {
+            }).then(function(input) {
                 if (! input) {
                     swal ('退款理由不可空', '', 'error');
                     return;
                 }
                 // 请求退款接口
                 axios.post('{{ route('orders.apply_refund', [$order->id]) }}', {reason: input})
-                .then(function () {
+                .then(function() {
                     swal('申请退款成功', '', 'success')
-                    .then(function () {
+                    .then(function() {
                         location.reload();
                     });
                 });

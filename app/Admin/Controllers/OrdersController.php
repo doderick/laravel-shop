@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Exceptions\InvalidRequestException;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Http\Requests\Admin\HandleRefundRequest;
 
 class OrdersController extends Controller
 {
@@ -139,6 +140,36 @@ class OrdersController extends Controller
 
         // 返回上一页
         return redirect()->back();
+    }
+
+    /**
+     * 处理退款申请
+     *
+     * @param Order $order
+     * @param HandleRefundRequest $request
+     * @return void
+     */
+    public function handleRefund(Order $order, HandleRefundRequest $request)
+    {
+        // 判断订单状态是否正确
+        if ($order->refund_status !== Order::REFUND_STATUS_APPLIED) {
+            throw new InvalidRequestException('订单状态不正确');
+        }
+        // 是否同意退款
+        if ($request->input('agree')) {
+            // 同意退款先留空
+        } else {
+            // 将拒绝退款理由放到订单的 extra 字段中
+            $extra                           = $order->extra ?: [];
+            $extra['refund_disagree_reason'] = $request->input('reason');
+            // 将订单的退款状态改为未退款
+            $order->update([
+                'refund_status' => Order::REFUND_STATUS_PENDING,
+                'extra'         => $extra,
+            ]);
+        }
+
+        return $order;
     }
 
 }
