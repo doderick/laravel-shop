@@ -10,9 +10,10 @@ use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
+use App\Exceptions\InternalException;
 use App\Exceptions\InvalidRequestException;
-use Encore\Admin\Controllers\HasResourceActions;
 use App\Http\Requests\Admin\HandleRefundRequest;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class OrdersController extends Controller
 {
@@ -157,7 +158,8 @@ class OrdersController extends Controller
         }
         // 是否同意退款
         if ($request->input('agree')) {
-            // 同意退款先留空
+            // 调用退款逻辑
+            $this->_refundOrder($order);
         } else {
             // 将拒绝退款理由放到订单的 extra 字段中
             $extra                           = $order->extra ?: [];
@@ -172,4 +174,52 @@ class OrdersController extends Controller
         return $order;
     }
 
+    /**
+     * 处理退款
+     *
+     * @param Order $order
+     * @return void
+     */
+    protected function _refundOrder(Order $order)
+    {
+        // 判断该订单的支付方式
+        switch ($order->payment_method) {
+            case 'wechat':
+                // 暂留空
+                // todo
+                break;
+            case 'alipay':
+                // 生成退款订单号
+                $refundNo = Order::getAvailableRefundNo();
+                // 调用支付宝支付实例的 refund 方法
+                $ret = app('alipay')->refund([
+                    'out_trade_no'   => $order->no,
+                    'refund_amount'  => $order->total_amount,
+                    'out_request_no' => $refundNo,
+                ]);
+                // 根据支付宝的文档，如果返回值里有 sub_code 字段说明退款失败
+                if ($ret->sub_code) {
+                    // 将退款失败的保存存入 extra 字段
+                    $extra                       = $order->extra;
+                    $extra['refund_failed_code'] = $ret->sub_code;
+                    // 将订单的退款状态标记为退款失败
+                    $order->update([
+                        'refund_no'     => $refundNo,
+                        'refund_status' => Order::REFUND_STATUS_FAILED,
+                        'extra'         => $extra,
+                    ]);
+                } else {
+                    // 将订单的退款状态标记为退款成功并保存退款订单号
+                    $order->update([
+                        'refund_no'     => $refundNo,
+                        'refund_status' => Order::REFUND_STATUS_SUCCESS,
+                    ]);
+                }
+                break;
+            default:
+            // 原则上不可能出现，这个只是为了代码健壮性
+                throw new InternalException('未知订单支付方式：'.$order->payment_method);
+                break;
+        }
+    }
 }
