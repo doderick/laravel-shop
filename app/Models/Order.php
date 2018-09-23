@@ -105,6 +105,17 @@ class Order extends Model
     }
 
     /**
+     * 处理订单与优惠券的关联
+     * 一对一
+     *
+     * @return void
+     */
+    public function couponCode()
+    {
+        return $this->belongsTo(CouponCode::class);
+    }
+
+    /**
      * 生成订单号
      *
      * @return void
