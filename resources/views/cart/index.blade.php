@@ -82,6 +82,19 @@
                                     <textarea name="remark" class="form-control" rows="3"></textarea>
                                 </div>
                             </div>
+                            {{-- 优惠码开始 --}}
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">优惠码</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name="coupon_code" id="" class="form-control">
+                                        <span id="coupon_desc" class="help-block"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button type="button" id="btn-check-coupon" class="btn btn-success">检查</button>
+                                        <button type="button" id="btn-cancel-coupon" class="btn btn-danger" style="display: none;">取消</button>
+                                    </div>
+                                </div>
+                            {{-- 优惠码结束 --}}
                             <div class="form-group">
                                 <div class="col-sm-3 col-sm-offset-3">
                                     <button type="button" class="btn btn-primary btn-create-order">提交订单</button>
@@ -103,7 +116,7 @@
 @section('scriptsAfterJs')
 <script>
     $(document).ready(function() {
-        {{-- 监听移除按钮事件 --}}
+        {{-- 监听 移除 按钮事件 --}}
         $('.btn-remove').click(function() {
             var id = $(this).closest('tr').data('id');
             swal({
@@ -132,7 +145,7 @@
                 $(this).prop('checked', checked);
             });
         });
-        {{-- 监听创建订单按钮的点击事件 --}}
+        {{-- 监听 提交订单 按钮的点击事件 --}}
         $('.btn-create-order').click(function() {
             {{-- 构建请求参数，将用户选择的地址的 id 和备注内容写入请求参数 --}}
             var req = {
@@ -186,6 +199,42 @@
                         swal('系统错误', '', 'error');
                     }
                 });
+        });
+        {{-- 监听 优惠券检查 按钮的点击事件 --}}
+        $('#btn-check-coupon').click(function() {
+            {{-- 获取用户输入的优惠码 --}}
+            var code = $('input[name=coupon_code]').val();
+            {{-- 如果没有输入则弹框提示 --}}
+            if (! code) {
+                swal('请输入优惠码', '', 'warning');
+                return;
+            }
+            {{-- 调用检查接口 --}}
+            axios.get('/coupon_codes/' + encodeURIComponent(code))
+                .then(function(response) {
+                    $('#coupon_desc').text(response.data.description);
+                    $('input[name=coupon_code]').prop('readonly', true);
+                    $('#btn-cancel-coupon').show();
+                    $('#btn-check-coupon').hide();
+                }, function(error) {
+                    {{-- 如果返回码是 404，说明优惠券不存在 --}}
+                    if (error.response.status === 404) {
+                        swal('优惠码不存在', '', 'error');
+                    {{-- 如果返回码是 403，说明有其他条件不满足 --}}
+                    } else if (error.response.status === 403) {
+                        swal(error.response.data.msg, '', 'error');
+                    {{-- 其它错误 --}}
+                    } else {
+                        swal('系统内部错误', '', 'error');
+                    }
+                })
+        });
+        {{-- 监听 优惠券取消 按钮的点击事件 --}}
+        $('#btn-cancel-coupon').click(function() {
+            $('#coupon_desc').text('');
+            $('input[name=coupon_code]').prop('readonly', false);
+            $('#btn-cancel-coupon').hide();
+            $('#btn-check-coupon').show();
         });
     });
 </script>
