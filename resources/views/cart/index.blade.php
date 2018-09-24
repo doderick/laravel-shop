@@ -152,6 +152,8 @@
                 address_id: $('#order-form').find('select[name=address]').val(),
                 items: [],
                 remark: $('#order-form').find('textarea[name=remark]').val(),
+                {{-- 提交优惠码信息 --}}
+                coupon_code: $('input[name=coupon_code]').val(),
             };
             {{-- 遍历购物车中的商品 SKU --}}
             $('table tr[data-id]').each(function() {
