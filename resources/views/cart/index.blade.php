@@ -196,6 +196,8 @@
                             content: $(html)[0],
                             icon: 'error',
                         });
+                    } else if (error.response.status === 403) {
+                        swal(error.response.data.msg, '', 'error');
                     } else {
                         {{-- 其它情况则是系统出错 --}}
                         swal('系统错误', '', 'error');

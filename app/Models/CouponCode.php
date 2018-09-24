@@ -82,7 +82,7 @@ class CouponCode extends Model
         return $str . '减' . str_replace('.00', '', $this->value);
     }
 
-    public function checkAvailable($orderAmount = null)
+    public function checkAvailable(User $user, $orderAmount = null)
     {
         // 如果优惠码没有启用，优惠券不存在
         if (! $this->enabled) {
@@ -103,6 +103,23 @@ class CouponCode extends Model
         // 如果设置了最小可使用订单金额，且当前订单金额 小于 该金额，不满足使用条件
         if (! is_null($orderAmount) && $orderAmount < $this->min_amount) {
             throw new CouponCodeUnavailableException('订单金额不满足该使用该优惠券的最低金额');
+        }
+
+        // 判断用户是否使用过该优惠券
+        $used = Order::where('user_id', $user->id)
+                        ->where('coupon_code_id', $this->id)
+                        ->where(function($query) {
+                            $query->where(function($query) {
+                                $query->whereNull('paid_at')
+                                        ->where('closed', false);
+                            })->orWhere(function($query) {
+                                $query->whereNotNull('paid_at')
+                                        ->where('refund_status', Order::REFUND_STATUS_PENDING);
+                            });
+                        })
+                        ->exists();
+        if ($used) {
+            throw new CouponCodeUnavailableException('你已经使用过这张优惠券了');
         }
     }
 

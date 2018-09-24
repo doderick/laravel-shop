@@ -29,10 +29,10 @@ class OrderService
         // 如果是否传入了优惠券，先检查优惠券是否可用
         if ($coupon) {
             // 此时还没有计算出订单总金额，先不校验
-            $coupon->checkAvailable();
+            $coupon->checkAvailable($user);
         }
         // 开启一个数据库事务
-        $order = \DB::transaction(function () use ($user, $address, $remark, $items, $coupon) {
+        $order = \DB::transaction(function() use ($user, $address, $remark, $items, $coupon) {
             // 更新地址的最后使用时间
             $address->update(['last_used_at' => Carbon::now()]);
             // 创建一个订单
@@ -75,7 +75,7 @@ class OrderService
             // 计算使用优惠券之后的金额
             if ($coupon) {
                 // 判断是否符合优惠券的使用规则
-                $coupon->checkAvailable($totalAmount);
+                $coupon->checkAvailable($user, $totalAmount);
                 // 将订单金额修改为优惠后的金额
                 $totalAmount = $coupon->getAdjustedPrice($totalAmount);
                 // 将订单与优惠券关联
