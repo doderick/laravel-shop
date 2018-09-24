@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'email_verified',
+        'name', 'email', 'password', 'avatar', 'email_verified',
     ];
 
     /**
@@ -71,5 +71,17 @@ class User extends Authenticatable
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        // 监听模型创建事件，当模型创建时触发
+        static::creating(function($model) {
+            // 如果模型的 avatar 字段为空，则使用默认头像
+            if (! $model->avatar) {
+                $model->avatar = config('app.url') . '/images/avatar_0.png';
+            }
+        });
     }
 }
