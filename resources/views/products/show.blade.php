@@ -70,7 +70,7 @@
                     </ul>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="product-detail-tab">
-                            {!! $product->description !!}
+                            {{ $product->description }}
                         </div>
                         <div role="tabpanel" class="tab-pane" id="product-reviews-tab">
                             {{-- 评论列表开始 --}}

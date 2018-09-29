@@ -63,6 +63,7 @@
                                                                 请于 {{ $order->created_at->addSeconds(config('app.order_ttl'))->format('H:i') }} 前完成支付<br>
                                                                 否则订单将自动关闭
                                                             @endif
+                                                            | {{ \App\Models\Order::$shipStatusMap[$order->ship_status] }}
                                                         </td>
                                                         <td rowspan="{{ count($order->items) }}" class="text-center">
                                                             <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="btn btn-primary btn-xs">查看订单</a>
